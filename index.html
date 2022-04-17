@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+   <link rel="stylesheet" href="index.css">
+</head>
+<body>
+   <div class="video-player">
+      <video id="video" preload="metadata">
+         <source src="https://source.geminikspace.com/history.mp4" type="video/mp4">
+      </video>
+      <div class="video-controls">
+         <ul class="controls-bar">
+            <li class="controls-bar-list" id="video-play" style="cursor: pointer;">
+            </li>
+            <li class="controls-bar-list" id="video-volume">
+               <div id="volume-muted"></div>
+               <div id="volume-bar">
+                  <div id="volume-progess">
+                     <div id="volume-shadow"></div>
+                     <div id="volume-btn" style="cursor: pointer;"></div>
+                  </div>
+               </div>
+            </li>
+            <li class="controls-bar-list" id="video-progress-wrap">
+               <div id="video-progress-shadow"></div>
+               <button id="video-progress" style="cursor: pointer;"></button>
+            </li>
+         </ul>
+      </div>
+   </div>
+   <script src="index.js"></script>
+</body>
+</html>
