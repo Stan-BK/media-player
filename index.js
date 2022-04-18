@@ -1,42 +1,87 @@
 ;(function() {
-  function customVideo() {
+  function CustomVideo() {
     var videoPlayer = document.getElementsByClassName('video-player')[0]
     var videoControls = document.getElementsByClassName('video-controls')[0]
     var video = document.getElementById('video')
+    var progressWrap = document.getElementById('video-progress-wrap')
+    var progressShadow = document.getElementById('video-progress-shadow')
+    var progress = document.getElementById('video-progress')
     var isPlay = false
     function init() {
+      initVideoInfo()
       controlOpacity()
       controlPaly()
       controlVolume()
       controlProgress()
     }
     init()
+
+    function initVideoInfo() {
+      var time = document.getElementById('video-time')
+      video.addEventListener('loadeddata', function() {
+        time.innerHTML = getTime(video.duration)
+        progress.style.left = '-5px'
+        progressShadow.style.width = '0px'
+      })
+      video.addEventListener('error', function() {
+        alert('视频错误')
+      })
+    }
+
+    function getTime(sec) {
+      var time = [], num, timeset = [60 * 60, 60], i = 0
+      while(i < 2) {
+        var num = Math.floor(sec / timeset[i])
+        sec %= timeset[i++]
+        if (i === 1 && num === 0)
+          continue
+        time.push(String(num).padStart(2, 0))
+      }
+      time.push(Math.floor(sec).toString().padStart(2, 0))
+      time = time.reduce((prev, cur) => {
+        return prev + ':' + cur
+      })
+      return time
+    }
+
     function controlOpacity() {
       var timer = null
       videoPlayer.addEventListener('mousemove', function() {
         clearTimeout(timer)
         videoControls.style.opacity = 1
-        timer = setTimeout(() => {
-          if (isPlay)
-            videoControls.style.opacity = 0
-        }, 1000)
+        if (isPlay)
+          timer = setTimeout(() => {
+              videoControls.style.opacity = 0
+          }, 1000)
       })
     }
     function controlPaly() {
+      var playBtn = document.getElementById('video-play-btn')
       var playControl = document.getElementById('video-play')
-      var play = '<svg t="1650174798292" class="icon play" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2599" width="16" height="16"><path d="M128 138.666667c0-47.232 33.322667-66.666667 74.176-43.562667l663.146667 374.954667c40.96 23.168 40.853333 60.8 0 83.882666L202.176 928.896C161.216 952.064 128 932.565333 128 885.333333v-746.666666z" fill="#3D3D3D" p-id="2600"></path></svg>'
-      var pause = '<svg t="1650175120628" class="icon pause" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3517" width="16" height="16"><path d="M426.666667 138.666667v746.666666a53.393333 53.393333 0 0 1-53.333334 53.333334H266.666667a53.393333 53.393333 0 0 1-53.333334-53.333334V138.666667a53.393333 53.393333 0 0 1 53.333334-53.333334h106.666666a53.393333 53.393333 0 0 1 53.333334 53.333334z m330.666666-53.333334H650.666667a53.393333 53.393333 0 0 0-53.333334 53.333334v746.666666a53.393333 53.393333 0 0 0 53.333334 53.333334h106.666666a53.393333 53.393333 0 0 0 53.333334-53.333334V138.666667a53.393333 53.393333 0 0 0-53.333334-53.333334z" fill="#5C5C66" p-id="3518"></path></svg>'
-  
+      var play = '<svg t="1650174798292" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2599" width="16" height="16"><path d="M128 138.666667c0-47.232 33.322667-66.666667 74.176-43.562667l663.146667 374.954667c40.96 23.168 40.853333 60.8 0 83.882666L202.176 928.896C161.216 952.064 128 932.565333 128 885.333333v-746.666666z" fill="#3D3D3D" p-id="2600"></path></svg>'
+      var pause = '<svg t="1650175120628" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3517" width="16" height="16"><path d="M426.666667 138.666667v746.666666a53.393333 53.393333 0 0 1-53.333334 53.333334H266.666667a53.393333 53.393333 0 0 1-53.333334-53.333334V138.666667a53.393333 53.393333 0 0 1 53.333334-53.333334h106.666666a53.393333 53.393333 0 0 1 53.333334 53.333334z m330.666666-53.333334H650.666667a53.393333 53.393333 0 0 0-53.333334 53.333334v746.666666a53.393333 53.393333 0 0 0 53.333334 53.333334h106.666666a53.393333 53.393333 0 0 0 53.333334-53.333334V138.666667a53.393333 53.393333 0 0 0-53.333334-53.333334z" fill="#5C5C66" p-id="3518"></path></svg>'
+      
+      playBtn.style.display = "block"
       playControl.innerHTML = play
-      playControl.addEventListener('click', function() {
+      video.addEventListener('dblclick', videoPlay)
+      playBtn.addEventListener('click', videoPlay)
+      playControl.addEventListener('click', videoPlay)
+      function videoPlay() {
         isPlay = !isPlay
         if (isPlay) {
+          playBtn.style.display = "none"
           playControl.innerHTML = pause
           video.play()
         } else {
+          playBtn.style.display = "block"
           playControl.innerHTML = play
           video.pause()
         }
+      }
+      video.addEventListener('ended', function() {
+        isPlay = false
+        playBtn.style.display = "block"
+        playControl.innerHTML = play
       })
     }
 
@@ -57,7 +102,7 @@
       var volumeBtn = document.getElementById('volume-btn')
       var volumeShadow = document.getElementById('volume-shadow')
       volumeBtn.addEventListener('mousedown', function(e) {
-
+        e.preventDefault()
         volumeBtn.addEventListener('mousemove', changeVolume)
 
         function changeVolume(e) {
@@ -80,23 +125,32 @@
     }
 
     function controlProgress() {
-      var progressWrap = document.getElementById('video-progress-wrap')
-      var progressShadow = document.getElementById('video-progress-shadow')
-      var progress = document.getElementById('video-progress')
+      var time = document.getElementById('video-curtime')
       video.addEventListener('timeupdate', updateProgress)
       function updateProgress() {
         var width = progressWrap.getBoundingClientRect().width
         width = video.currentTime / video.duration * width - 5 + 'px'
         progress.style.left = width
         progressShadow.style.width = width
+        time.innerHTML = getTime(video.currentTime)
       }
-      progress.addEventListener('mousedown', function() {
+      progressWrap.addEventListener('mousedown', function(e) {
+        var offset = e.offsetX
+        var width = e.target.offsetWidth
+        progress.style.left = offset + 'px'
+        progressShadow.style.width = offset + 'px'
+        var curTime = offset / width * video.duration
+        time.innerHTML = getTime(curTime)
+        video.currentTime = curTime
+      })
+      progress.addEventListener('mousedown', function(e) {
+        e.preventDefault()
+        e.stopPropagation()
         var { ofLeft: wrapOfLeft } = getOffset(progressWrap)
         video.removeEventListener('timeupdate', updateProgress)
         document.addEventListener('mousemove', changeProgress) 
         var curTime = video.currentTime
         function changeProgress(e) {
-          e.preventDefault()
           var width = progressWrap.getBoundingClientRect().width
           var moveX = e.clientX
           var offset = moveX - wrapOfLeft
@@ -104,6 +158,7 @@
             progress.style.left = offset + 'px'
             progressShadow.style.width = offset + 'px'
             curTime = (offset + 5) / width * video.duration
+            time.innerHTML = getTime(curTime)
           }
         }
         
@@ -117,7 +172,7 @@
       })
     }
   }
-  window.customVideo = customVideo
+  window.CustomVideo = CustomVideo
 
   function getOffset(elem) {
     var ofLeft = elem.offsetLeft
@@ -134,4 +189,20 @@
     }
   }
 })()
-customVideo()
+CustomVideo()
+
+var btn1 = document.getElementById('chooseVideo')
+var btn2 = document.getElementById('confirmVideo')
+btn1.addEventListener('click', function() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = "video/mp4, video/webm"
+  input.click()
+  input.onchange = function() {
+    document.getElementById('video').src = URL.createObjectURL(input.files[0])
+  }
+})
+
+btn2.addEventListener('click', function() {
+  document.getElementById('video').src = document.getElementById('videoUrl').value
+})
