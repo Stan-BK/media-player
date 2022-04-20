@@ -49,7 +49,8 @@
   display: none;
   width: 20px;
   height: 62px;
-  left: 2px;
+  left: 50%;
+  transform: translate(-50%);
   top: -62px;
   border-radius: 10px;
   background-color: #42424288;
@@ -89,7 +90,7 @@
   height: 10px;
   border-radius: 10px;
   background-color: #424242;
-  flex: 9;
+  flex: 5;
   margin: 0 10px;
 }
 #video-progress {
@@ -110,4 +111,28 @@
   border-radius: 10px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+#play-rate {
+  position: relative;
+  cursor: pointer;
+}
+#rate-bar {
+  width: 100%;
+  display: none;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.rate-bar-list {
+  background-color: #42424242;
+  font-size: .6em;
+  width: 35px;
+  padding: 1px 0;
+  box-sizing: border-box;
+}
+.rate-bar-list:hover {
+  background-color: #42424282;
 }

@@ -1,5 +1,5 @@
 ;(function() {
-  function CustomVideo() {
+  function VideoPlayer(options) {
     var videoPlayer = document.getElementsByClassName('video-player')[0]
     var videoControls = document.getElementsByClassName('video-controls')[0]
     var video = document.getElementById('video')
@@ -7,24 +7,37 @@
     var progressShadow = document.getElementById('video-progress-shadow')
     var progress = document.getElementById('video-progress')
     var isPlay = false
+    var { onloaded, onerror, rateList } = options
+    init()
+  
+    return video
     function init() {
       initVideoInfo()
       controlOpacity()
       controlPaly()
       controlVolume()
       controlProgress()
+      controlPlaybackRate()
     }
-    init()
 
     function initVideoInfo() {
       var time = document.getElementById('video-time')
       video.addEventListener('loadeddata', function() {
+        if (onloaded) {
+          if (typeof onloaded !== 'function')
+            throw new TypeError('onloaded must be a function')
+          onloaded()
+        }
         time.innerHTML = getTime(video.duration)
         progress.style.left = '-5px'
         progressShadow.style.width = '0px'
       })
       video.addEventListener('error', function() {
-        alert('视频错误')
+        if (onerror) {
+          if (typeof onerror !== 'function')
+            throw new TypeError('onerror must be a function')
+          onerror()
+        }
       })
     }
 
@@ -171,8 +184,36 @@
         }
       })
     }
+
+    function controlPlaybackRate() {
+      var rateControl = document.getElementById('play-rate')
+      var ratebar = document.getElementById('rate-bar')
+      var curRate = document.getElementById('cur-rate')
+      var barList = '<li class="rate-bar-list">{{}}</li>'
+      var rate = [0.5, 0.75, 1, 1.25, 1.5, 2]
+      if (rateList && rateList.length) {
+        rate = rateList.reverse()
+      }
+      rate.reverse().forEach(item => {
+        ratebar.innerHTML += barList.replace('{{}}', item)
+      })
+      rateControl.addEventListener('mouseenter', function() {
+        ratebar.style.display = 'block'
+        ratebar.style.top = '-' + ratebar.getBoundingClientRect().height + 'px'
+      })
+      rateControl.addEventListener('mouseleave', function() {
+        ratebar.style.display = 'none'
+        ratebar.style.top = '-' + ratebar.getBoundingClientRect().height + 'px'
+      })
+      ratebar.addEventListener('click', function(e) {
+        var cRate = Number(e.target.innerHTML)
+        video.playbackRate = cRate
+        curRate.innerText = cRate + 'x'
+        ratebar.style.display = 'none'
+      }, false)
+    }
   }
-  window.CustomVideo = CustomVideo
+  window.VideoPlayer = VideoPlayer
 
   function getOffset(elem) {
     var ofLeft = elem.offsetLeft
@@ -189,7 +230,11 @@
     }
   }
 })()
-CustomVideo()
+const video = VideoPlayer({
+  onerror() {
+    alert('视频错误')
+  }
+})
 
 var btn1 = document.getElementById('chooseVideo')
 var btn2 = document.getElementById('confirmVideo')
